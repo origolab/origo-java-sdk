@@ -29,6 +29,7 @@ public class RawTransaction {
     private String to;
     private BigInteger value;
     private String data;
+    private boolean isPrivate;
 
     protected RawTransaction(
             BigInteger nonce,
@@ -36,13 +37,24 @@ public class RawTransaction {
             BigInteger gasLimit,
             String to,
             BigInteger value,
-            String data) {
+            String data,
+            boolean isPrivate) {
         this.nonce = nonce;
         this.gasPrice = gasPrice;
         this.gasLimit = gasLimit;
         this.to = to;
         this.value = value;
         this.data = data != null ? Numeric.cleanHexPrefix(data) : null;
+        this.isPrivate = isPrivate;
+    }
+    protected RawTransaction(
+            BigInteger nonce,
+            BigInteger gasPrice,
+            BigInteger gasLimit,
+            String to,
+            BigInteger value,
+            String data) {
+        this(nonce, gasPrice, gasLimit, to, value, data, false);
     }
 
     public static RawTransaction createContractTransaction(
@@ -104,4 +116,6 @@ public class RawTransaction {
     public String getData() {
         return data;
     }
+
+    public boolean isPrivate() { return isPrivate; }
 }

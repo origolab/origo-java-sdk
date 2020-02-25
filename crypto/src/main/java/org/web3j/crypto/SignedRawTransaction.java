@@ -26,7 +26,19 @@ public class SignedRawTransaction extends RawTransaction implements SignatureDat
             BigInteger value,
             String data,
             Sign.SignatureData signatureData) {
-        super(nonce, gasPrice, gasLimit, to, value, data);
+        this(nonce, gasPrice, gasLimit, to, value, data, signatureData, false);
+    }
+
+    public SignedRawTransaction(
+            BigInteger nonce,
+            BigInteger gasPrice,
+            BigInteger gasLimit,
+            String to,
+            BigInteger value,
+            String data,
+            Sign.SignatureData signatureData,
+            boolean isPrivate) {
+        super(nonce, gasPrice, gasLimit, to, value, data, isPrivate);
         this.signatureData = signatureData;
     }
 
