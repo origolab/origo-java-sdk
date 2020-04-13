@@ -19,20 +19,21 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class CredentialsTest {
 
     @Test
-    public void testCredentialsFromString() {
+    public void testCredentialsFromString() throws Exception {
         Credentials credentials = Credentials.create(SampleKeys.KEY_PAIR);
         verify(credentials);
     }
 
     @Test
-    public void testCredentialsFromECKeyPair() {
+    public void testCredentialsFromECKeyPair() throws Exception {
         Credentials credentials =
                 Credentials.create(SampleKeys.PRIVATE_KEY_STRING, SampleKeys.PUBLIC_KEY_STRING);
         verify(credentials);
     }
 
-    private void verify(Credentials credentials) {
+    private void verify(Credentials credentials) throws Exception {
         assertEquals(credentials.getAddress(), (SampleKeys.ADDRESS));
+        assertEquals(credentials.getOgoAddress(), (SampleKeys.ADDRESS_OGO));
         assertEquals(credentials.getEcKeyPair(), (SampleKeys.KEY_PAIR));
     }
 }

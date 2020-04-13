@@ -22,6 +22,7 @@ import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.core.methods.response.EthGetTransactionCount;
 import org.web3j.protocol.core.methods.response.EthSendTransaction;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
+import org.web3j.utils.Bech32;
 import org.web3j.utils.Convert;
 import org.web3j.utils.Numeric;
 
@@ -35,6 +36,25 @@ public class CreateRawTransactionIT extends Scenario {
     public void testTransferEther() throws Exception {
         BigInteger nonce = getNonce(ALICE.getAddress());
         RawTransaction rawTransaction = createEtherTransaction(nonce, BOB.getAddress());
+
+        byte[] signedMessage = TransactionEncoder.signMessage(rawTransaction, ALICE);
+        String hexValue = Numeric.toHexString(signedMessage);
+
+        EthSendTransaction ethSendTransaction =
+                web3j.ethSendRawTransaction(hexValue).sendAsync().get();
+        String transactionHash = ethSendTransaction.getTransactionHash();
+
+        assertFalse(transactionHash.isEmpty());
+
+        TransactionReceipt transactionReceipt = waitForTransactionReceipt(transactionHash);
+
+        assertEquals(transactionHash, transactionReceipt.getTransactionHash());
+    }
+
+    @Test
+    public void testTransferOgo() throws Exception {
+        BigInteger nonce = getNonce(ALICE.getAddress());
+        RawTransaction rawTransaction = createOgoTransaction(nonce, Bech32.toBech32Address(BOB.getAddress()));
 
         byte[] signedMessage = TransactionEncoder.signMessage(rawTransaction, ALICE);
         String hexValue = Numeric.toHexString(signedMessage);
@@ -77,6 +97,12 @@ public class CreateRawTransactionIT extends Scenario {
         BigInteger value = Convert.toWei("0.5", Convert.Unit.ETHER).toBigInteger();
 
         return RawTransaction.createEtherTransaction(nonce, GAS_PRICE, GAS_LIMIT, toAddress, value);
+    }
+
+    private static RawTransaction createOgoTransaction(BigInteger nonce, String toAddress) throws Exception {
+        BigInteger value = Convert.toWei("0.5", Convert.Unit.ETHER).toBigInteger();
+
+        return RawTransaction.createOgoTransaction(nonce, GAS_PRICE, GAS_LIMIT, toAddress, value);
     }
 
     private static RawTransaction createSmartContractTransaction(BigInteger nonce)

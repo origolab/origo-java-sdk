@@ -14,9 +14,12 @@ package org.web3j.protocol.core.methods.response;
 
 import java.math.BigInteger;
 
+import org.web3j.utils.Bech32;
 import org.web3j.utils.Numeric;
 
-/** Transaction object used by both {@link EthTransaction} and {@link EthBlock}. */
+/**
+ * Transaction object used by both {@link EthTransaction} and {@link EthBlock}.
+ */
 public class Transaction {
     private static final int CHAIN_ID_INC = 35;
     private static final int LOWER_REAL_V = 27;
@@ -38,8 +41,49 @@ public class Transaction {
     private String r;
     private String s;
     private long v; // see https://github.com/web3j/web3j/issues/44
+    private boolean isPrivate;
 
-    public Transaction() {}
+    public Transaction() {
+    }
+
+    public Transaction(
+            String hash,
+            String nonce,
+            String blockHash,
+            String blockNumber,
+            String transactionIndex,
+            String from,
+            String to,
+            String value,
+            String gas,
+            String gasPrice,
+            String input,
+            String creates,
+            String publicKey,
+            String raw,
+            String r,
+            String s,
+            long v,
+            boolean isPrivate) {
+        this.hash = hash;
+        this.nonce = nonce;
+        this.blockHash = blockHash;
+        this.blockNumber = blockNumber;
+        this.transactionIndex = transactionIndex;
+        this.from = from;
+        this.to = to;
+        this.value = value;
+        this.gasPrice = gasPrice;
+        this.gas = gas;
+        this.input = input;
+        this.creates = creates;
+        this.publicKey = publicKey;
+        this.raw = raw;
+        this.r = r;
+        this.s = s;
+        this.v = v;
+        this.isPrivate = isPrivate;
+    }
 
     public Transaction(
             String hash,
@@ -59,23 +103,25 @@ public class Transaction {
             String r,
             String s,
             long v) {
-        this.hash = hash;
-        this.nonce = nonce;
-        this.blockHash = blockHash;
-        this.blockNumber = blockNumber;
-        this.transactionIndex = transactionIndex;
-        this.from = from;
-        this.to = to;
-        this.value = value;
-        this.gasPrice = gasPrice;
-        this.gas = gas;
-        this.input = input;
-        this.creates = creates;
-        this.publicKey = publicKey;
-        this.raw = raw;
-        this.r = r;
-        this.s = s;
-        this.v = v;
+        this(
+                hash,
+                nonce,
+                blockHash,
+                blockNumber,
+                transactionIndex,
+                from,
+                to,
+                value,
+                gas,
+                gasPrice,
+                input,
+                creates,
+                publicKey,
+                raw,
+                r,
+                s,
+                v,
+                false);
     }
 
     public String getHash() {
@@ -134,12 +180,20 @@ public class Transaction {
         return from;
     }
 
+    public String getOgoFrom() throws Exception {
+        return Bech32.toBech32Address(from);
+    }
+
     public void setFrom(String from) {
         this.from = from;
     }
 
     public String getTo() {
         return to;
+    }
+
+    public String getOgoTo() throws Exception {
+        return Bech32.toBech32Address(to);
     }
 
     public void setTo(String to) {
@@ -259,6 +313,14 @@ public class Transaction {
         }
     }
 
+    public boolean isPrivate() {
+        return isPrivate;
+    }
+
+    public void setPrivate(boolean isPrivate) {
+        this.isPrivate = isPrivate;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -348,8 +410,8 @@ public class Transaction {
         result =
                 31 * result
                         + (getTransactionIndexRaw() != null
-                                ? getTransactionIndexRaw().hashCode()
-                                : 0);
+                        ? getTransactionIndexRaw().hashCode()
+                        : 0);
         result = 31 * result + (getFrom() != null ? getFrom().hashCode() : 0);
         result = 31 * result + (getTo() != null ? getTo().hashCode() : 0);
         result = 31 * result + (getValueRaw() != null ? getValueRaw().hashCode() : 0);
@@ -362,6 +424,7 @@ public class Transaction {
         result = 31 * result + (getR() != null ? getR().hashCode() : 0);
         result = 31 * result + (getS() != null ? getS().hashCode() : 0);
         result = 31 * result + BigInteger.valueOf(getV()).hashCode();
+        result = 31 * result + (isPrivate()? 1 : 0);
         return result;
     }
 }

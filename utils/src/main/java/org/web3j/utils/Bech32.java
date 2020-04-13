@@ -198,7 +198,7 @@ public class Bech32 {
         Bech32Data data = decode(address);
 
         if (!data.hrp.equals(HRP)) {
-            throw new Exception("Expected hrp to be zil");
+            throw new Exception("Expected hrp to be ogopub");
         }
 
         List<Integer> bits = convertBits(data.data, 5, 8, false);

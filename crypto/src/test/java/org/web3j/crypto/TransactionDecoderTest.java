@@ -16,6 +16,7 @@ import java.math.BigInteger;
 
 import org.junit.jupiter.api.Test;
 
+import org.web3j.utils.Bech32;
 import org.web3j.utils.Numeric;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -40,6 +41,29 @@ public class TransactionDecoderTest {
         assertEquals(gasPrice, result.getGasPrice());
         assertEquals(gasLimit, result.getGasLimit());
         assertEquals(to, result.getTo());
+        assertEquals(value, result.getValue());
+        assertEquals("", result.getData());
+        assertFalse(result.isPrivate());
+    }
+
+    @Test
+    public void testOgoTransactionDecoding() throws Exception {
+        BigInteger nonce = BigInteger.ZERO;
+        BigInteger gasPrice = BigInteger.ONE;
+        BigInteger gasLimit = BigInteger.TEN;
+        String to = Bech32.toBech32Address("0x0add5355");
+        BigInteger value = BigInteger.valueOf(Long.MAX_VALUE);
+        RawTransaction rawTransaction =
+                RawTransaction.createOgoTransaction(nonce, gasPrice, gasLimit, to, value);
+        byte[] encodedMessage = TransactionEncoder.encode(rawTransaction);
+        String hexMessage = Numeric.toHexString(encodedMessage);
+
+        RawTransaction result = TransactionDecoder.decode(hexMessage);
+        assertNotNull(result);
+        assertEquals(nonce, result.getNonce());
+        assertEquals(gasPrice, result.getGasPrice());
+        assertEquals(gasLimit, result.getGasLimit());
+        assertEquals(to, Bech32.toBech32Address(result.getTo()));
         assertEquals(value, result.getValue());
         assertEquals("", result.getData());
         assertFalse(result.isPrivate());
@@ -80,7 +104,71 @@ public class TransactionDecoderTest {
     }
 
     @Test
+    public void testOgoDecodingSigned() throws Exception {
+        BigInteger nonce = BigInteger.ZERO;
+        BigInteger gasPrice = BigInteger.ONE;
+        BigInteger gasLimit = BigInteger.TEN;
+        String to = Bech32.toBech32Address("0x0add5355");
+        BigInteger value = BigInteger.valueOf(Long.MAX_VALUE);
+        RawTransaction rawTransaction =
+                RawTransaction.createEtherTransaction(nonce, gasPrice, gasLimit, to, value);
+        byte[] signedMessage =
+                TransactionEncoder.signMessage(rawTransaction, SampleKeys.CREDENTIALS);
+        String hexMessage = Numeric.toHexString(signedMessage);
+
+        RawTransaction result = TransactionDecoder.decode(hexMessage);
+        assertNotNull(result);
+        assertEquals(nonce, result.getNonce());
+        assertEquals(gasPrice, result.getGasPrice());
+        assertEquals(gasLimit, result.getGasLimit());
+        assertEquals(to, Bech32.toBech32Address(result.getTo()));
+        assertEquals(value, result.getValue());
+        assertEquals("", result.getData());
+        assertTrue(result instanceof SignedRawTransaction);
+        SignedRawTransaction signedResult = (SignedRawTransaction) result;
+        assertNotNull(signedResult.getSignatureData());
+        Sign.SignatureData signatureData = signedResult.getSignatureData();
+        byte[] encodedTransaction = TransactionEncoder.encode(rawTransaction);
+        BigInteger key = Sign.signedMessageToKey(encodedTransaction, signatureData);
+        assertEquals(key, SampleKeys.PUBLIC_KEY);
+        assertEquals(SampleKeys.ADDRESS, signedResult.getFrom());
+        signedResult.verify(SampleKeys.ADDRESS);
+        assertNull(signedResult.getChainId());
+        assertFalse(result.isPrivate());
+    }
+
+    @Test
     public void testDecodingSignedChainId() throws Exception {
+        BigInteger nonce = BigInteger.ZERO;
+        BigInteger gasPrice = BigInteger.ONE;
+        BigInteger gasLimit = BigInteger.TEN;
+        String to = Bech32.toBech32Address("0x0add5355");
+        BigInteger value = BigInteger.valueOf(Long.MAX_VALUE);
+        long chainId = 46;
+        RawTransaction rawTransaction =
+                RawTransaction.createEtherTransaction(nonce, gasPrice, gasLimit, to, value);
+        byte[] signedMessage =
+                TransactionEncoder.signMessage(rawTransaction, chainId, SampleKeys.CREDENTIALS);
+        String hexMessage = Numeric.toHexString(signedMessage);
+
+        RawTransaction result = TransactionDecoder.decode(hexMessage);
+        assertNotNull(result);
+        assertEquals(nonce, result.getNonce());
+        assertEquals(gasPrice, result.getGasPrice());
+        assertEquals(gasLimit, result.getGasLimit());
+        assertEquals(to, result.getTo());
+        assertEquals(value, result.getValue());
+        assertEquals("", result.getData());
+        assertTrue(result instanceof SignedRawTransaction);
+        SignedRawTransaction signedResult = (SignedRawTransaction) result;
+        assertEquals(SampleKeys.ADDRESS, signedResult.getFrom());
+        signedResult.verify(SampleKeys.ADDRESS);
+        assertEquals(chainId, signedResult.getChainId().longValue());
+        assertFalse(result.isPrivate());
+    }
+
+    @Test
+    public void testOgoDecodingSignedChainId() throws Exception {
         BigInteger nonce = BigInteger.ZERO;
         BigInteger gasPrice = BigInteger.ONE;
         BigInteger gasLimit = BigInteger.TEN;
@@ -98,7 +186,7 @@ public class TransactionDecoderTest {
         assertEquals(nonce, result.getNonce());
         assertEquals(gasPrice, result.getGasPrice());
         assertEquals(gasLimit, result.getGasLimit());
-        assertEquals(to, result.getTo());
+        assertEquals(to, Bech32.toBech32Address(result.getTo()));
         assertEquals(value, result.getValue());
         assertEquals("", result.getData());
         assertTrue(result instanceof SignedRawTransaction);
