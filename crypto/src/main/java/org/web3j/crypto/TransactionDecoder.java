@@ -15,7 +15,6 @@ package org.web3j.crypto;
 import java.math.BigInteger;
 import java.util.Arrays;
 
-import com.sun.tools.javac.util.ArrayUtils;
 import org.web3j.rlp.RlpDecoder;
 import org.web3j.rlp.RlpList;
 import org.web3j.rlp.RlpString;
@@ -43,13 +42,15 @@ public class TransactionDecoder {
             return RawTransaction.createTransaction(nonce, gasPrice, gasLimit, to, value, data);
         } else {
             final int offset = (values.getValues().size() == 10) ? 1 : 0;
-            if(offset > 0) {
+            if (offset > 0) {
                 RlpString to_rlp_string = ((RlpString) values.getValues().get(3));
-                byte[] to_bytes =  to_rlp_string.getBytes();
+                byte[] to_bytes = to_rlp_string.getBytes();
                 // PrivateCall
                 if (to_bytes.length == 21) {
-                    to = (RlpString.create(Arrays.copyOfRange(to_bytes, 1, to_bytes.length))).asString();
-                } else if(to_bytes.length == 1){
+                    to =
+                            (RlpString.create(Arrays.copyOfRange(to_bytes, 1, to_bytes.length)))
+                                    .asString();
+                } else if (to_bytes.length == 1) {
                     // PublicToPrivate or PrivateToPrivate, set to as empty string.
                     to = "";
                 }
@@ -57,11 +58,13 @@ public class TransactionDecoder {
             final byte[] v = ((RlpString) values.getValues().get(6 + offset)).getBytes();
             final byte[] r =
                     Numeric.toBytesPadded(
-                            Numeric.toBigInt(((RlpString) values.getValues().get(7 + offset)).getBytes()),
+                            Numeric.toBigInt(
+                                    ((RlpString) values.getValues().get(7 + offset)).getBytes()),
                             32);
             final byte[] s =
                     Numeric.toBytesPadded(
-                            Numeric.toBigInt(((RlpString) values.getValues().get(8 + offset)).getBytes()),
+                            Numeric.toBigInt(
+                                    ((RlpString) values.getValues().get(8 + offset)).getBytes()),
                             32);
             final Sign.SignatureData signatureData = new Sign.SignatureData(v, r, s);
             return new SignedRawTransaction(

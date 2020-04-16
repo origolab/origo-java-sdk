@@ -54,7 +54,8 @@ public class CreateRawTransactionIT extends Scenario {
     @Test
     public void testTransferOgo() throws Exception {
         BigInteger nonce = getNonce(ALICE.getAddress());
-        RawTransaction rawTransaction = createOgoTransaction(nonce, Bech32.toBech32Address(BOB.getAddress()));
+        RawTransaction rawTransaction =
+                createOgoTransaction(nonce, Bech32.toBech32Address(BOB.getAddress()));
 
         byte[] signedMessage = TransactionEncoder.signMessage(rawTransaction, ALICE);
         String hexValue = Numeric.toHexString(signedMessage);
@@ -99,7 +100,8 @@ public class CreateRawTransactionIT extends Scenario {
         return RawTransaction.createEtherTransaction(nonce, GAS_PRICE, GAS_LIMIT, toAddress, value);
     }
 
-    private static RawTransaction createOgoTransaction(BigInteger nonce, String toAddress) throws Exception {
+    private static RawTransaction createOgoTransaction(BigInteger nonce, String toAddress)
+            throws Exception {
         BigInteger value = Convert.toWei("0.5", Convert.Unit.ETHER).toBigInteger();
 
         return RawTransaction.createOgoTransaction(nonce, GAS_PRICE, GAS_LIMIT, toAddress, value);
