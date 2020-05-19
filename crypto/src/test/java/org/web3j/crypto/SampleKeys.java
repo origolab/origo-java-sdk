@@ -25,6 +25,7 @@ public class SampleKeys {
             "0x506bc1dc099358e5137292f4efdd57e400f29ba5132aa5d12b18dac1c1f6aab"
                     + "a645c0b7b58158babbfa6c6cd5a48aa7340a8749176b120e8516216787a13dc76";
     public static final String ADDRESS = "0xef678007d18427e6022059dbc264f27507cd1ffc";
+    public static final String ADDRESS_OGO = "ogopub1aancqp73ssn7vq3qt8duye8jw5ru68luewhlxn";
     public static final String ADDRESS_NO_PREFIX = Numeric.cleanHexPrefix(ADDRESS);
 
     public static final String PASSWORD = "Insecure Pa55w0rd";

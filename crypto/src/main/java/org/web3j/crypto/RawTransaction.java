@@ -14,6 +14,7 @@ package org.web3j.crypto;
 
 import java.math.BigInteger;
 
+import org.web3j.utils.Bech32;
 import org.web3j.utils.Numeric;
 
 /**
@@ -47,6 +48,7 @@ public class RawTransaction {
         this.data = data != null ? Numeric.cleanHexPrefix(data) : null;
         this.isPrivate = isPrivate;
     }
+
     protected RawTransaction(
             BigInteger nonce,
             BigInteger gasPrice,
@@ -75,6 +77,13 @@ public class RawTransaction {
             BigInteger value) {
 
         return new RawTransaction(nonce, gasPrice, gasLimit, to, value, "");
+    }
+
+    public static RawTransaction createOgoTransaction(
+            BigInteger nonce, BigInteger gasPrice, BigInteger gasLimit, String to, BigInteger value)
+            throws Exception {
+        return new RawTransaction(
+                nonce, gasPrice, gasLimit, Bech32.fromBech32Address(to), value, "");
     }
 
     public static RawTransaction createTransaction(
@@ -117,5 +126,7 @@ public class RawTransaction {
         return data;
     }
 
-    public boolean isPrivate() { return isPrivate; }
+    public boolean isPrivate() {
+        return isPrivate;
+    }
 }

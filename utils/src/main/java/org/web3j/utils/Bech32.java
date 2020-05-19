@@ -1,3 +1,15 @@
+/*
+ * Copyright 2020 Web3 Labs Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+ * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
+ */
 package org.web3j.utils;
 
 import java.util.ArrayList;
@@ -5,21 +17,20 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
-
 public class Bech32 {
     /** The Bech32 character set for encoding. */
     private static final String CHARSET = "qpzry9x8gf2tvdw0s3jn54khce6mua7l";
 
     /** The Bech32 character set for decoding. */
     private static final byte[] CHARSET_REV = {
-            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-            15, -1, 10, 17, 21, 20, 26, 30,  7,  5, -1, -1, -1, -1, -1, -1,
-            -1, 29, -1, 24, 13, 25,  9,  8, 23, -1, 18, 22, 31, 27, 19, -1,
-            1,  0,  3, 16, 11, 28, 12, 14,  6,  4,  2, -1, -1, -1, -1, -1,
-            -1, 29, -1, 24, 13, 25,  9,  8, 23, -1, 18, 22, 31, 27, 19, -1,
-            1,  0,  3, 16, 11, 28, 12, 14,  6,  4,  2, -1, -1, -1, -1, -1
+        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+        15, -1, 10, 17, 21, 20, 26, 30, 7, 5, -1, -1, -1, -1, -1, -1,
+        -1, 29, -1, 24, 13, 25, 9, 8, 23, -1, 18, 22, 31, 27, 19, -1,
+        1, 0, 3, 16, 11, 28, 12, 14, 6, 4, 2, -1, -1, -1, -1, -1,
+        -1, 29, -1, 24, 13, 25, 9, 8, 23, -1, 18, 22, 31, 27, 19, -1,
+        1, 0, 3, 16, 11, 28, 12, 14, 6, 4, 2, -1, -1, -1, -1, -1
     };
 
     public static class Bech32Data {
@@ -35,13 +46,13 @@ public class Bech32 {
     /** Find the polynomial with value coefficients mod the generator as 30-bit. */
     private static int polymod(final byte[] values) {
         int c = 1;
-        for (byte v_i: values) {
+        for (byte v_i : values) {
             int c0 = (c >>> 25) & 0xff;
             c = ((c & 0x1ffffff) << 5) ^ (v_i & 0xff);
-            if ((c0 &  1) != 0) c ^= 0x3b6a57b2;
-            if ((c0 &  2) != 0) c ^= 0x26508e6d;
-            if ((c0 &  4) != 0) c ^= 0x1ea119fa;
-            if ((c0 &  8) != 0) c ^= 0x3d4233dd;
+            if ((c0 & 1) != 0) c ^= 0x3b6a57b2;
+            if ((c0 & 2) != 0) c ^= 0x26508e6d;
+            if ((c0 & 4) != 0) c ^= 0x1ea119fa;
+            if ((c0 & 8) != 0) c ^= 0x3d4233dd;
             if ((c0 & 16) != 0) c ^= 0x2a1462b3;
         }
         return c;
@@ -70,7 +81,7 @@ public class Bech32 {
     }
 
     /** Create a checksum. */
-    private static byte[] createChecksum(final String hrp, final byte[] values)  {
+    private static byte[] createChecksum(final String hrp, final byte[] values) {
         byte[] hrpExpanded = expandHrp(hrp);
         byte[] enc = new byte[hrpExpanded.length + values.length + 6];
         System.arraycopy(hrpExpanded, 0, enc, 0, hrpExpanded.length);
@@ -115,24 +126,25 @@ public class Bech32 {
             char c = str.charAt(i);
             if (c < 33 || c > 126) throw new AddressFormatException.InvalidCharacter(c, i);
             if (c >= 'a' && c <= 'z') {
-                if (upper)
-                    throw new AddressFormatException.InvalidCharacter(c, i);
+                if (upper) throw new AddressFormatException.InvalidCharacter(c, i);
                 lower = true;
             }
             if (c >= 'A' && c <= 'Z') {
-                if (lower)
-                    throw new AddressFormatException.InvalidCharacter(c, i);
+                if (lower) throw new AddressFormatException.InvalidCharacter(c, i);
                 upper = true;
             }
         }
         final int pos = str.lastIndexOf('1');
         if (pos < 1) throw new AddressFormatException.InvalidPrefix("Missing human-readable part");
         final int dataPartLength = str.length() - 1 - pos;
-        if (dataPartLength < 6) throw new AddressFormatException.InvalidDataLength("Data part too short: " + dataPartLength);
+        if (dataPartLength < 6)
+            throw new AddressFormatException.InvalidDataLength(
+                    "Data part too short: " + dataPartLength);
         byte[] values = new byte[dataPartLength];
         for (int i = 0; i < dataPartLength; ++i) {
             char c = str.charAt(i + pos + 1);
-            if (CHARSET_REV[c] == -1) throw new AddressFormatException.InvalidCharacter(c, i + pos + 1);
+            if (CHARSET_REV[c] == -1)
+                throw new AddressFormatException.InvalidCharacter(c, i + pos + 1);
             values[i] = CHARSET_REV[c];
         }
         String hrp = str.substring(0, pos).toLowerCase(Locale.ROOT);
@@ -168,17 +180,13 @@ public class Bech32 {
         }
 
         return ret;
-
     }
 
     public static String HRP = "ogopub";
 
-
     public static String toBech32Address(String address) throws Exception {
 
-
-        address = address.toLowerCase().replace("0x","");
-
+        address = address.toLowerCase().replace("0x", "");
         List<Integer> bits = convertBits(ByteUtil.hexStringToByteArray(address), 8, 5, false);
 
         byte[] addrBz = new byte[bits.size()];
@@ -198,7 +206,7 @@ public class Bech32 {
         Bech32Data data = decode(address);
 
         if (!data.hrp.equals(HRP)) {
-            throw new Exception("Expected hrp to be zil");
+            throw new Exception("Expected hrp to be ogopub");
         }
 
         List<Integer> bits = convertBits(data.data, 5, 8, false);
@@ -215,15 +223,14 @@ public class Bech32 {
 
     public static void main(String args[]) throws Exception {
         byte[] values = new byte[20];
-        for(int i = 0; i < values.length; i++) {
+        for (int i = 0; i < values.length; i++) {
             values[i] = 0;
         }
 
         String bech32 = Bech32.toBech32Address("3A8B8ECF0A6AB5AAFA08EA4C74A84E27B208EBEA");
         String hex = Bech32.fromBech32Address(bech32);
-        System.out.println("To bech32 : "  + bech32);
+        System.out.println("To bech32 : " + bech32);
 
-        System.out.println("To hex: "  + hex);
+        System.out.println("To hex: " + hex);
     }
-
 }

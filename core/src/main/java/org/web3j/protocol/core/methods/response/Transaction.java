@@ -14,6 +14,7 @@ package org.web3j.protocol.core.methods.response;
 
 import java.math.BigInteger;
 
+import org.web3j.utils.Bech32;
 import org.web3j.utils.Numeric;
 
 /** Transaction object used by both {@link EthTransaction} and {@link EthBlock}. */
@@ -38,6 +39,7 @@ public class Transaction {
     private String r;
     private String s;
     private long v; // see https://github.com/web3j/web3j/issues/44
+    private boolean isPrivate;
 
     public Transaction() {}
 
@@ -58,7 +60,8 @@ public class Transaction {
             String raw,
             String r,
             String s,
-            long v) {
+            long v,
+            boolean isPrivate) {
         this.hash = hash;
         this.nonce = nonce;
         this.blockHash = blockHash;
@@ -76,6 +79,46 @@ public class Transaction {
         this.r = r;
         this.s = s;
         this.v = v;
+        this.isPrivate = isPrivate;
+    }
+
+    public Transaction(
+            String hash,
+            String nonce,
+            String blockHash,
+            String blockNumber,
+            String transactionIndex,
+            String from,
+            String to,
+            String value,
+            String gas,
+            String gasPrice,
+            String input,
+            String creates,
+            String publicKey,
+            String raw,
+            String r,
+            String s,
+            long v) {
+        this(
+                hash,
+                nonce,
+                blockHash,
+                blockNumber,
+                transactionIndex,
+                from,
+                to,
+                value,
+                gas,
+                gasPrice,
+                input,
+                creates,
+                publicKey,
+                raw,
+                r,
+                s,
+                v,
+                false);
     }
 
     public String getHash() {
@@ -134,12 +177,20 @@ public class Transaction {
         return from;
     }
 
+    public String getOgoFrom() throws Exception {
+        return Bech32.toBech32Address(from);
+    }
+
     public void setFrom(String from) {
         this.from = from;
     }
 
     public String getTo() {
         return to;
+    }
+
+    public String getOgoTo() throws Exception {
+        return Bech32.toBech32Address(to);
     }
 
     public void setTo(String to) {
@@ -259,6 +310,14 @@ public class Transaction {
         }
     }
 
+    public boolean isPrivate() {
+        return isPrivate;
+    }
+
+    public void setPrivate(boolean isPrivate) {
+        this.isPrivate = isPrivate;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -270,6 +329,9 @@ public class Transaction {
 
         Transaction that = (Transaction) o;
 
+        if (isPrivate() != that.isPrivate()) {
+            return false;
+        }
         if (getV() != that.getV()) {
             return false;
         }
@@ -362,6 +424,7 @@ public class Transaction {
         result = 31 * result + (getR() != null ? getR().hashCode() : 0);
         result = 31 * result + (getS() != null ? getS().hashCode() : 0);
         result = 31 * result + BigInteger.valueOf(getV()).hashCode();
+        result = 31 * result + (isPrivate() ? 1 : 0);
         return result;
     }
 }

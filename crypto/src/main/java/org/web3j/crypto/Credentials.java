@@ -12,6 +12,7 @@
  */
 package org.web3j.crypto;
 
+import org.web3j.utils.Bech32;
 import org.web3j.utils.Numeric;
 
 /** Credentials wrapper. */
@@ -31,6 +32,10 @@ public class Credentials {
 
     public String getAddress() {
         return address;
+    }
+
+    public String getOgoAddress() throws Exception {
+        return Bech32.toBech32Address(address);
     }
 
     public static Credentials create(ECKeyPair ecKeyPair) {

@@ -557,7 +557,8 @@ public class EthBlock extends Response<EthBlock.Block> {
                 String raw,
                 String r,
                 String s,
-                int v) {
+                int v,
+                boolean isPrivate) {
             super(
                     hash,
                     nonce,
@@ -575,7 +576,47 @@ public class EthBlock extends Response<EthBlock.Block> {
                     raw,
                     r,
                     s,
-                    v);
+                    v,
+                    isPrivate);
+        }
+
+        public TransactionObject(
+                String hash,
+                String nonce,
+                String blockHash,
+                String blockNumber,
+                String transactionIndex,
+                String from,
+                String to,
+                String value,
+                String gasPrice,
+                String gas,
+                String input,
+                String creates,
+                String publicKey,
+                String raw,
+                String r,
+                String s,
+                int v) {
+            this(
+                    hash,
+                    nonce,
+                    blockHash,
+                    blockNumber,
+                    transactionIndex,
+                    from,
+                    to,
+                    value,
+                    gasPrice,
+                    gas,
+                    input,
+                    creates,
+                    publicKey,
+                    raw,
+                    r,
+                    s,
+                    v,
+                    false);
         }
 
         @Override
