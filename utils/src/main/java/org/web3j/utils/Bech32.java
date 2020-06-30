@@ -12,10 +12,7 @@
  */
 package org.web3j.utils;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 public class Bech32 {
     /** The Bech32 character set for encoding. */
@@ -187,6 +184,9 @@ public class Bech32 {
     public static String toBech32Address(String address) throws Exception {
 
         address = address.toLowerCase().replace("0x", "");
+        if (address.length() < 20) {
+            address = address + String.join("", Collections.nCopies(20 - address.length(), "0"));
+        }
         List<Integer> bits = convertBits(ByteUtil.hexStringToByteArray(address), 8, 5, false);
 
         byte[] addrBz = new byte[bits.size()];
