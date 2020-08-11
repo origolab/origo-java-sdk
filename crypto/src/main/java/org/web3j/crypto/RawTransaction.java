@@ -118,6 +118,10 @@ public class RawTransaction {
         return to;
     }
 
+    public String getOgoTo() throws Exception {
+        return Bech32.toBech32Address(to);
+    }
+
     public BigInteger getValue() {
         return value;
     }
