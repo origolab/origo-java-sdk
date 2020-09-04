@@ -221,6 +221,15 @@ public class Bech32 {
         return ByteUtil.byteArrayToHexString(buf);
     }
 
+    public static boolean isValidBech32Address(String address) {
+        try {
+            fromBech32Address(address);
+        } catch (Exception e) {
+            return false;
+        }
+        return true;
+    }
+
     public static void main(String args[]) throws Exception {
         byte[] values = new byte[20];
         for (int i = 0; i < values.length; i++) {

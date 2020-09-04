@@ -15,6 +15,7 @@ package org.web3j.crypto;
 import java.math.BigInteger;
 import java.security.SignatureException;
 
+import org.web3j.utils.Bech32;
 import org.web3j.utils.Numeric;
 
 public interface SignatureDataOperations {
@@ -34,6 +35,10 @@ public interface SignatureDataOperations {
         Sign.SignatureData signatureDataV = new Sign.SignatureData(getRealV(v), r, s);
         BigInteger key = Sign.signedMessageToKey(encodedTransaction, signatureDataV);
         return "0x" + Keys.getAddress(key);
+    }
+
+    default String getOgoFrom() throws Exception {
+        return Bech32.toBech32Address(getFrom());
     }
 
     default void verify(String from) throws SignatureException {
